@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Fold — Unfold Your Health (Black Prototype)</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Outfit:wght@100;200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: #070707; font-family: 'Outfit', sans-serif; color: #e4e0d4; overflow-x: hidden; }
+
+  /* NAV */
+  nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 28px 72px; position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(7,7,7,0.88); backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: border-color 0.4s;
+  }
+  nav.scrolled { border-bottom-color: rgba(200,175,90,0.2); }
+  .nav-logo { font-family: 'Outfit', sans-serif; font-weight: 100; font-size: 20px; letter-spacing: 9px; text-transform: uppercase; color: #e4e0d4; text-decoration: none; }
+  .nav-links { display: flex; gap: 44px; list-style: none; }
+  .nav-links a { font-size: 11px; font-weight: 200; letter-spacing: 4px; text-transform: uppercase; color: rgba(228,224,212,0.35); text-decoration: none; transition: color 0.3s; }
+  .nav-links a:hover { color: #c8af5a; }
+  .nav-cta { padding: 11px 26px; border: 1px solid rgba(200,175,90,0.4); font-size: 10px; font-weight: 200; letter-spacing: 3px; text-transform: uppercase; color: #c8af5a; text-decoration: none; transition: all 0.4s; cursor: pointer; background: transparent; }
+  .nav-cta:hover { background: rgba(200,175,90,0.1); border-color: rgba(200,175,90,0.7); }
+
+  /* HERO */
+  .hero { min-height: 100vh; display: flex; align-items: center; padding: 140px 72px 100px; position: relative; overflow: hidden; }
+  .hero-glow { position: absolute; width: 700px; height: 700px; background: radial-gradient(circle, rgba(100,80,30,0.12) 0%, transparent 65%); top: 50%; left: 58%; transform: translate(-50%,-50%); pointer-events: none; }
+  .hero-grid { position: absolute; inset: 0; pointer-events: none;
+    background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 60% 70% at 65% 50%, black, transparent);
+  }
+  .hero-inner { max-width: 1200px; width: 100%; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; position: relative; z-index: 2; }
+
+  .hero-eyebrow { display: flex; align-items: center; gap: 16px; margin-bottom: 30px; }
+  .ey-line { display: none; }
+  .ey-text { font-size: 13px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase; color: rgba(200,175,90,0.8); }
+
+  .hero-h1 { font-family: 'Playfair Display', serif; font-size: clamp(50px, 6.5vw, 80px); font-weight: 400; line-height: 1.07; color: #e4e0d4; margin-bottom: 34px; }
+  .hero-h1 em { font-style: italic; color: #c8af5a; }
+  .hero-tagline { font-size: 10px; font-weight: 200; letter-spacing: 8px; text-transform: uppercase; color: rgba(200,175,90,0.45); margin-bottom: 50px; }
+
+  .hero-actions { display: flex; gap: 24px; align-items: center; }
+  .btn-gold { padding: 15px 40px; background: transparent; border: 1px solid rgba(200,175,90,0.5); font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 200; letter-spacing: 4px; text-transform: uppercase; color: #c8af5a; cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.4s; position: relative; overflow: hidden; }
+  .btn-gold::after { content: ''; position: absolute; inset: 0; background: rgba(200,175,90,0.08); transform: scaleX(0); transform-origin: left; transition: transform 0.4s; }
+  .btn-gold:hover::after { transform: scaleX(1); }
+  .btn-ghost-dk { font-size: 11px; font-weight: 200; letter-spacing: 3px; text-transform: uppercase; color: rgba(228,224,212,0.35); text-decoration: none; border-bottom: 1px solid rgba(228,224,212,0.15); padding-bottom: 2px; transition: all 0.3s; }
+  .btn-ghost-dk:hover { color: rgba(228,224,212,0.7); border-color: rgba(228,224,212,0.4); }
+
+  /* PRODUCT VISUAL */
+  .hero-visual { display: flex; align-items: center; justify-content: center; height: 520px; position: relative; }
+  .scale-container { position: relative; width: 320px; }
+  .product-img-wrap-dk {
+    width: 280px; margin: 0 auto;
+    border-radius: 8px; overflow: hidden;
+    border: 1px solid rgba(200,175,90,0.2);
+    box-shadow: 0 0 60px rgba(200,175,90,0.06), 0 30px 80px rgba(0,0,0,0.5);
+    background: #0d0c09;
+    animation: imgFloatDk 5s ease-in-out infinite alternate;
+  }
+  @keyframes imgFloatDk {
+    0% { transform: translateY(0px); }
+    100% { transform: translateY(-10px); }
+  }
+  .product-img-wrap-dk img { width: 100%; height: auto; display: block; filter: contrast(1.05) brightness(0.92); }
+
+  .orbit { position: absolute; font-size: 9px; font-weight: 200; letter-spacing: 3px; text-transform: uppercase; color: rgba(228,224,212,0.35); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .orbit::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: rgba(200,175,90,0.5); flex-shrink: 0; }
+  .o1 { top: 30px; right: 0; }
+  .o2 { top: 50%; right: -20px; transform: translateY(-50%); }
+  .o3 { bottom: 60px; left: 0; }
+
+  /* STATS */
+  .stats-row { display: flex; border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .s-col { flex: 1; padding: 44px; text-align: center; border-right: 1px solid rgba(255,255,255,0.04); }
+  .s-col:last-child { border-right: none; }
+  .s-n { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 400; color: #c8af5a; line-height: 1; }
+  .s-l { font-size: 10px; font-weight: 200; letter-spacing: 3px; text-transform: uppercase; color: rgba(228,224,212,0.3); margin-top: 8px; }
+
+  /* SECTIONS */
+  .dk-section { padding: 100px 72px; max-width: 1200px; margin: 0 auto; }
+  .sec-tag { font-size: 10px; font-weight: 200; letter-spacing: 6px; text-transform: uppercase; color: rgba(200,175,90,0.5); margin-bottom: 20px; }
+  .sec-h2 { font-family: 'Playfair Display', serif; font-size: clamp(36px, 4vw, 54px); font-weight: 400; line-height: 1.12; color: #e4e0d4; margin-bottom: 24px; }
+  .sec-h2 em { font-style: italic; color: #c8af5a; }
+  .sec-body { font-size: 15px; font-weight: 200; line-height: 1.95; color: rgba(228,224,212,0.45); max-width: 620px; }
+
+  /* FEATURE GRID */
+  .feat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.04); }
+  .feat-dk { background: #070707; padding: 56px 40px; transition: background 0.4s; cursor: default; }
+  .feat-dk:hover { background: #0f0e0a; }
+  .feat-bar { width: 40px; height: 1px; background: rgba(200,175,90,0.4); margin-bottom: 28px; transition: width 0.3s; }
+  .feat-dk:hover .feat-bar { width: 64px; }
+  .feat-title-dk { font-size: 12px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase; color: #e4e0d4; margin-bottom: 14px; }
+  .feat-body-dk { font-size: 14px; font-weight: 200; line-height: 1.9; color: rgba(228,224,212,0.38); }
+
+  /* CHANNELS */
+  .ch-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.04); margin-top: 48px; }
+  .ch-dk { background: #070707; padding: 44px 40px; transition: background 0.4s; }
+  .ch-dk:hover { background: #0d0c08; }
+  .ch-num-dk { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 400; color: rgba(200,175,90,0.2); margin-bottom: 14px; }
+  .ch-title-dk { font-size: 12px; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; color: #e4e0d4; margin-bottom: 10px; }
+  .ch-body-dk { font-size: 13px; font-weight: 200; line-height: 1.85; color: rgba(228,224,212,0.38); }
+
+  /* CTA */
+  .cta-dk { padding: 140px 72px; text-align: center; border-top: 1px solid rgba(255,255,255,0.04); position: relative; overflow: hidden; }
+  .cta-bg-word { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-family: 'Playfair Display', serif; font-size: clamp(80px, 14vw, 160px); font-weight: 400; font-style: italic; color: rgba(228,224,212,0.03); white-space: nowrap; pointer-events: none; letter-spacing: -4px; }
+  .cta-h-dk { font-family: 'Playfair Display', serif; font-size: clamp(38px, 5vw, 60px); font-weight: 400; font-style: italic; color: #e4e0d4; margin-bottom: 20px; position: relative; z-index: 1; }
+  .cta-sub-dk { font-size: 10px; font-weight: 200; letter-spacing: 6px; text-transform: uppercase; color: rgba(228,224,212,0.25); margin-bottom: 52px; position: relative; z-index: 1; }
+  .cta-form-dk { display: flex; gap: 0; max-width: 420px; margin: 0 auto; position: relative; z-index: 1; }
+  .cta-in { flex: 1; padding: 15px 20px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-right: none; color: #e4e0d4; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 200; outline: none; transition: border-color 0.3s; }
+  .cta-in::placeholder { color: rgba(228,224,212,0.2); }
+  .cta-in:focus { border-color: rgba(200,175,90,0.4); }
+  .cta-btn-dk { padding: 15px 28px; background: rgba(200,175,90,0.15); border: 1px solid rgba(200,175,90,0.4); font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 200; letter-spacing: 3px; text-transform: uppercase; color: #c8af5a; cursor: pointer; transition: all 0.4s; white-space: nowrap; }
+  .cta-btn-dk:hover { background: rgba(200,175,90,0.25); border-color: rgba(200,175,90,0.7); }
+
+  /* FOOTER */
+  footer { padding: 48px 72px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); }
+  .fl { font-family: 'Outfit', sans-serif; font-weight: 100; font-size: 16px; letter-spacing: 7px; text-transform: uppercase; color: rgba(228,224,212,0.2); }
+  .ft { font-family: 'Playfair Display', serif; font-size: 13px; font-style: italic; color: rgba(200,175,90,0.35); }
+  .flinks { display: flex; gap: 30px; }
+  .flinks a { font-size: 11px; font-weight: 200; letter-spacing: 2px; text-transform: uppercase; color: rgba(228,224,212,0.2); text-decoration: none; transition: color 0.3s; }
+  .flinks a:hover { color: #c8af5a; }
+
+  .proto-badge { position: fixed; bottom: 24px; left: 24px; background: rgba(200,175,90,0.12); color: #c8af5a; border: 1px solid rgba(200,175,90,0.3); padding: 8px 16px; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; border-radius: 2px; z-index: 999; font-family: 'Outfit', sans-serif; }
+
+  @media (max-width: 768px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    .hero { padding: 100px 24px 60px; }
+    .hero-inner { grid-template-columns: 1fr; }
+    .hero-visual { display: none; }
+    .dk-section { padding: 60px 24px; }
+    .feat-grid { grid-template-columns: 1fr; }
+    .ch-grid { grid-template-columns: 1fr; }
+    .stats-row { flex-wrap: wrap; }
+    .s-col { min-width: 50%; }
+    footer { flex-direction: column; gap: 20px; text-align: center; }
+    .flinks { flex-wrap: wrap; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="mainNav">
+  <a class="nav-logo" href="#">The Fold</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#features">Product</a></li>
+    <li><a href="#who">Who It's For</a></li>
+    <li><a href="#purchase">Buy Now</a></li>
+  </ul>
+  <a class="nav-cta" href="#purchase">Buy Now</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow"><span class="ey-line"></span><span class="ey-text">Hospitals  /  Doctors  /  Wheelchair Users  /  Caregivers</span></div>
+      <h1 class="hero-h1">23 lb portable<br>wheelchair scale.<br><em>Weigh easy.</em></h1>
+      <div class="hero-tagline">Unfold Your Health</div>
+      <div class="hero-actions">
+        <a class="btn-gold" href="#purchase">Buy Now — $689</a>
+        <a class="btn-ghost-dk" href="#features">See How It Works</a>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:16px;flex-wrap:wrap;">
+        <a class="btn-ghost-dk" href="#affiliate" style="font-size:10px;">Become an Affiliate</a>
+        <a class="btn-ghost-dk" href="#community" style="font-size:10px;">Join Our Community</a>
+        <a class="btn-ghost-dk" href="#sponsor" style="font-size:10px;">Special Olympics — Come Say Hi!</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="scale-container">
+
+                <div class="product-img-wrap-dk">
+          <img src="TheFold_product.jpg" alt="The Fold — Medical Grade Wheelchair Scale" style="width:100%;display:block;border-radius:8px;">
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="stats-row">
+  <div class="s-col"><div class="s-n">3.3M</div><div class="s-l">US wheelchair users</div></div>
+  <div class="s-col"><div class="s-n">23 lb</div><div class="s-l">Device weight</div></div>
+  <div class="s-col"><div class="s-n">±0.1</div><div class="s-l">lb accuracy</div></div>
+  <div class="s-col"><div class="s-n">$689</div><div class="s-l">Retail price</div></div>
+</div>
+
+<div id="about" class="dk-section">
+  <div class="sec-tag">The Problem We're Solving</div>
+  <h2 class="sec-h2">Healthcare built on an<br>assumption: <em>everyone can stand.</em></h2>
+  <p class="sec-body">For over 12.2 million wheelchair users — including 250,000 veterans — this assumption has shaped a healthcare system that silently excludes them. Critical data like weight, posture, and hydration is rarely captured at home. Canary MedTech built The Fold to change that.</p>
+</div>
+
+<div id="features" style="padding: 0 72px 100px; max-width: 1200px; margin: 0 auto;">
+  <div class="sec-tag" style="margin-bottom: 40px;">The Product</div>
+  <div class="feat-grid">
+    <div class="feat-dk"><div class="feat-bar"></div><div class="feat-title-dk">Medical Grade</div><div class="feat-body-dk">Clinical ±0.1 lb accuracy in a consumer-facing form factor. Trusted by home health professionals.</div></div>
+    <div class="feat-dk"><div class="feat-bar"></div><div class="feat-title-dk">Truly Portable</div><div class="feat-body-dk">Folds completely flat — under one inch. Goes where you go. No clinic required.</div></div>
+    <div class="feat-dk"><div class="feat-bar"></div><div class="feat-title-dk">Built for Independence</div><div class="feat-body-dk">Designed from the ground up for wheelchair users. Dignity. Accuracy. Autonomy.</div></div>
+  </div>
+</div>
+
+<div id="who" class="dk-section" style="padding-top: 0;">
+  <div class="sec-tag">Who It Serves</div>
+  <h2 class="sec-h2" style="margin-bottom: 0;">Built for <em>every corner</em><br>of care.</h2>
+
+  <div style="font-size:10px;font-weight:200;letter-spacing:5px;text-transform:uppercase;color:rgba(200,175,90,0.5);margin:40px 0 0;">Clinical & Institutional</div>
+  <div class="ch-grid" style="margin-top:12px;">
+    <div class="ch-dk"><div class="ch-title-dk">Home Health & Caregivers</div><div class="ch-body-dk">Track weight changes between visits. Catch what matters before it becomes critical.</div></div>
+    <div class="ch-dk"><div class="ch-title-dk">Hospitals & Clinics</div><div class="ch-body-dk">A portable, accurate scale that comes to the patient — no separate weighing room required.</div></div>
+    <div class="ch-dk"><div class="ch-title-dk">Dialysis Centers</div><div class="ch-body-dk">Patients require weekly weight checks. Many are non-ambulatory. The Fold was made for this.</div></div>
+    <div class="ch-dk"><div class="ch-title-dk">Hospice & Palliative Care</div><div class="ch-body-dk">Nurses making home visits need clinical-grade equipment that travels. This does.</div></div>
+    <div class="ch-dk"><div class="ch-title-dk">Physical & Occupational Therapists</div><div class="ch-body-dk">Accurate weight data in the field, without the bulk of stationary clinic equipment.</div></div>
+    <div class="ch-dk"><div class="ch-title-dk">VA Hospitals & Veteran Home Health</div><div class="ch-body-dk">250,000+ veterans use wheelchairs. The Fold's origin story starts here — and so does its mission.</div></div>
+    <div class="ch-dk"><div class="ch-title-dk">School Nurses</div><div class="ch-body-dk">Students with mobility disabilities deserve the same routine health monitoring as everyone else.</div></div>
+    <div class="ch-dk"><div class="ch-title-dk">Correctional Facility Medical Units</div><div class="ch-body-dk">Clinical accuracy in constrained environments. Portable and secure.</div></div>
+  </div>
+
+  <div style="font-size:10px;font-weight:200;letter-spacing:5px;text-transform:uppercase;color:rgba(200,175,90,0.5);margin:48px 0 0;">Consumer & Community</div>
+  <div class="ch-grid" style="margin-top:12px;">
+    <div class="ch-dk"><div class="ch-title-dk">Wheelchair Users</div><div class="ch-body-dk">Independence at home. Know your numbers without a clinic visit. On your terms.</div></div>
+    <div class="ch-dk"><div class="ch-title-dk">Elderly Adults Aging in Place</div><div class="ch-body-dk">Anyone who can't stand reliably deserves accurate weight monitoring at home.</div></div>
+    <div class="ch-dk"><div class="ch-title-dk">Spinal Cord Injury Community</div><div class="ch-body-dk">Massive, highly networked, and deeply underserved by existing medical equipment.</div></div>
+    <div class="ch-dk"><div class="ch-title-dk">MS & ALS Patients</div><div class="ch-body-dk">Progressive mobility loss means growing need for home-based clinical tools.</div></div>
+    <div class="ch-dk"><div class="ch-title-dk">Bariatric Patients</div><div class="ch-body-dk">Post-surgery weight monitoring is critical. The Fold makes it possible without a clinic trip.</div></div>
+    <div class="ch-dk"><div class="ch-title-dk">Parents of Children with Disabilities</div><div class="ch-body-dk">Routine health tracking for kids with mobility challenges — at home, with ease.</div></div>
+  </div>
+
+  <div style="font-size:10px;font-weight:200;letter-spacing:5px;text-transform:uppercase;color:rgba(200,175,90,0.5);margin:48px 0 0;">Athletic & Performance</div>
+  <div class="ch-grid" style="margin-top:12px;">
+    <div class="ch-dk"><div class="ch-title-dk">Para-Athletes & Paralympic Programs</div><div class="ch-body-dk">Elite athletes in wheelchairs track weight like any pro. Now they have a tool built for them.</div></div>
+    <div class="ch-dk"><div class="ch-title-dk">Adaptive Sports Coaches</div><div class="ch-body-dk">Team-level weight monitoring for seated and adaptive athletes. Accurate. Portable. Fast.</div></div>
+    <div class="ch-dk"><div class="ch-title-dk">Sports Medicine</div><div class="ch-body-dk">Weight is a vital sign. Sports medicine professionals can now capture it for every patient.</div></div>
+  </div>
+
+  <div style="font-size:10px;font-weight:200;letter-spacing:5px;text-transform:uppercase;color:rgba(200,175,90,0.5);margin:48px 0 0;">Partnerships & Distribution</div>
+  <div class="ch-grid" style="margin-top:12px;">
+    <div class="ch-dk"><div class="ch-title-dk">Wheelchair Manufacturers</div><div class="ch-body-dk">Bundle The Fold as a premium add-on at point of purchase. A natural, high-value upsell.</div></div>
+    <div class="ch-dk"><div class="ch-title-dk">DME Suppliers</div><div class="ch-body-dk">Durable Medical Equipment suppliers sell directly to patients — often through insurance reimbursement.</div></div>
+    <div class="ch-dk"><div class="ch-title-dk">Home Health Staffing Agencies</div><div class="ch-body-dk">Agencies equip their nurses. The Fold becomes standard kit for every home health visit.</div></div>
+    <div class="ch-dk"><div class="ch-title-dk">Telehealth Platforms</div><div class="ch-body-dk">Weight is a critical vital sign telehealth can't currently capture at home. The Fold closes that gap.</div></div>
+  </div>
+</div>
+
+<div style="padding: 0 72px 100px; max-width: 1200px; margin: 0 auto;">
+  <div class="sec-tag">The Fold vs. The Rest</div>
+  <h2 class="sec-h2" style="margin-bottom: 40px;">Why <em>nothing else</em><br>comes close.</h2>
+  <div style="border: 1px solid rgba(255,255,255,0.06); overflow: hidden;">
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; background: rgba(200,175,90,0.08); border-bottom: 1px solid rgba(255,255,255,0.06);">
+      <div style="padding: 18px 28px; font-size: 10px; font-weight: 200; letter-spacing: 4px; text-transform: uppercase; color: rgba(228,224,212,0.3);">Feature</div>
+      <div style="padding: 18px 28px; text-align: center; font-size: 10px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase; color: #c8af5a;">The Fold</div>
+      <div style="padding: 18px 28px; text-align: center; font-size: 10px; font-weight: 200; letter-spacing: 3px; text-transform: uppercase; color: rgba(228,224,212,0.2);">Clinic Scale</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; border-bottom: 1px solid rgba(255,255,255,0.04);">
+      <div style="padding: 18px 28px; font-size: 14px; font-weight: 200; color: rgba(228,224,212,0.45);">Device weight</div>
+      <div style="padding: 18px 28px; text-align: center; font-size: 13px; font-weight: 300; color: #e4e0d4;">Lightweight</div>
+      <div style="padding: 18px 28px; text-align: center; font-size: 13px; color: rgba(228,224,212,0.2);">117 lbs</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; border-bottom: 1px solid rgba(255,255,255,0.04); background: rgba(255,255,255,0.01);">
+      <div style="padding: 18px 28px; font-size: 14px; font-weight: 200; color: rgba(228,224,212,0.45);">Folds flat for storage</div>
+      <div style="padding: 18px 28px; text-align: center; font-size: 15px; color: #7ec8a0;">✓</div>
+      <div style="padding: 18px 28px; text-align: center; font-size: 15px; color: rgba(228,224,212,0.15);">✗</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; border-bottom: 1px solid rgba(255,255,255,0.04);">
+      <div style="padding: 18px 28px; font-size: 14px; font-weight: 200; color: rgba(228,224,212,0.45);">Home use / personal ownership</div>
+      <div style="padding: 18px 28px; text-align: center; font-size: 15px; color: #7ec8a0;">✓</div>
+      <div style="padding: 18px 28px; text-align: center; font-size: 15px; color: rgba(228,224,212,0.15);">✗</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; border-bottom: 1px solid rgba(255,255,255,0.04); background: rgba(255,255,255,0.01);">
+      <div style="padding: 18px 28px; font-size: 14px; font-weight: 200; color: rgba(228,224,212,0.45);">Retail price</div>
+      <div style="padding: 18px 28px; text-align: center; font-size: 13px; font-weight: 300; color: #c8af5a;">$689</div>
+      <div style="padding: 18px 28px; text-align: center; font-size: 13px; color: rgba(228,224,212,0.2);">$3,375+</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr;">
+      <div style="padding: 18px 28px; font-size: 14px; font-weight: 200; color: rgba(228,224,212,0.45);">Designed for the patient</div>
+      <div style="padding: 18px 28px; text-align: center; font-size: 15px; color: #7ec8a0;">✓</div>
+      <div style="padding: 18px 28px; text-align: center; font-size: 15px; color: rgba(228,224,212,0.15);">✗</div>
+    </div>
+  </div>
+</div>
+
+
+  <div class="cta-bg-word">unfold</div>
+  <h2 class="cta-h-dk">Ready to unfold your health?</h2>
+  <p class="cta-sub-dk">Free shipping · 30-day returns · Medical-grade accuracy</p>
+  <a href="#" style="display:inline-block;padding:16px 52px;background:rgba(200,175,90,0.15);border:1px solid rgba(200,175,90,0.5);font-family:'Outfit',sans-serif;font-size:12px;font-weight:200;letter-spacing:4px;text-transform:uppercase;color:#c8af5a;text-decoration:none;position:relative;z-index:1;">Purchase — $689</a>
+</section>
+
+<section id="affiliate" style="padding:100px 72px;text-align:center;border-top:1px solid rgba(255,255,255,0.04);">
+  <div class="sec-tag" style="text-align:center;">Affiliate Program</div>
+  <h2 class="sec-h2" style="text-align:center;margin-bottom:16px;">Earn by sharing<br><em>something that matters.</em></h2>
+  <p style="font-size:15px;font-weight:200;line-height:1.9;color:rgba(228,224,212,0.45);max-width:520px;margin:0 auto 40px;">Join The Fold's affiliate program and earn commission on every sale you refer. Ideal for caregivers, healthcare professionals, disability advocates, and content creators.</p>
+  <a href="#" style="display:inline-block;padding:14px 40px;border:1px solid rgba(200,175,90,0.4);font-family:'Outfit',sans-serif;font-size:11px;font-weight:200;letter-spacing:4px;text-transform:uppercase;color:#c8af5a;text-decoration:none;">Apply to Affiliate Program</a>
+</section>
+
+<section id="community" style="padding:100px 72px;text-align:center;border-top:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.01);">
+  <div class="sec-tag" style="text-align:center;">Community</div>
+  <h2 class="sec-h2" style="text-align:center;margin-bottom:16px;">You're not alone<br><em>in this.</em></h2>
+  <p style="font-size:15px;font-weight:200;line-height:1.9;color:rgba(228,224,212,0.45);max-width:520px;margin:0 auto 40px;">Connect with wheelchair users, caregivers, and healthcare professionals who are changing the way we think about health at home. Share your story. Support others.</p>
+  <a href="#" style="display:inline-block;padding:14px 40px;border:1px solid rgba(200,175,90,0.4);font-family:'Outfit',sans-serif;font-size:11px;font-weight:200;letter-spacing:4px;text-transform:uppercase;color:#c8af5a;text-decoration:none;">Join Our Community</a>
+</section>
+
+<section id="sponsor" style="padding:100px 72px;text-align:center;border-top:1px solid rgba(255,255,255,0.04);">
+  <div class="sec-tag" style="text-align:center;">Special Olympics Partnership</div>
+  <h2 class="sec-h2" style="text-align:center;margin-bottom:16px;">We're a Special Olympics sponsor —<br><em>come say hi!</em></h2>
+  <p style="font-size:15px;font-weight:200;line-height:1.9;color:rgba(228,224,212,0.45);max-width:520px;margin:0 auto 40px;">We'll be at Special Olympics events cheering on every athlete. Stop by our booth, try The Fold, and say hello. We'd love to meet you.</p>
+  <a href="#" style="display:inline-block;padding:14px 40px;border:1px solid rgba(200,175,90,0.4);font-family:'Outfit',sans-serif;font-size:11px;font-weight:200;letter-spacing:4px;text-transform:uppercase;color:#c8af5a;text-decoration:none;">Find Us at the Next Event</a>
+</section>
+
+<footer>
+  <div class="fl">The Fold</div>
+  <div class="ft">Unfold Your Health</div>
+  <div class="flinks">
+    <a href="#">Privacy</a>
+    <a href="#">Contact</a>
+    <a href="https://www.canarymedtech.com" target="_blank">Canary MedTech</a>
+  </div>
+</footer>
+
+<div class="proto-badge">🌙 Dark Mode · Employ AI</div>
+
+<script>
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 40); });
+</script>
+</body>
+</html>
